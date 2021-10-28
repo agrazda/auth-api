@@ -2,7 +2,9 @@
 
 const express = require('express');
 const dataModules = require('../models');
-// const bearerAuth = require('../middleware/bearer.js')
+const bearerAuth = require('../middleware/bearer.js')
+const acl = require('../middleware/acl.js');
+const { user } = require('osenv');
 
 const router = express.Router();
 
@@ -16,11 +18,11 @@ router.param('model', (req, res, next) => {
   }
 });
 
-router.get('/:model', handleGetAll);
-router.get('/:model/:id', handleGetOne);
-router.post('/:model', handleCreate);
-router.put('/:model/:id', handleUpdate);
-router.delete('/:model/:id', handleDelete);
+router.get('/:model', bearerAuth, acl('read'), handleGetAll); // acl('read'), bearerAuth, handleGetAll);??
+router.get('/:model/:id', bearerAuth, acl('read'), handleGetOne); // acl('read'), bearerAuth, handleGetOne);??
+router.post('/:model', bearerAuth, acl('create'), handleCreate);
+router.put('/:model/:id', bearerAuth, acl('update'), handleUpdate);
+router.delete('/:model/:id', bearerAuth, acl('delete'), handleDelete);
 
 async function handleGetAll(req, res) {
   let allRecords = await req.model.get();
